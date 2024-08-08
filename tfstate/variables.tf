@@ -1,9 +1,3 @@
-variable "aws_profile" {}
-variable "region" {}
-/* variable "project" {}
-variable "environment" {}
-variable "created_by" {}
-variable "created_tool" {} */
 variable "dynamotfstate" {
     default = "tfstatedb"
     description = "dynomodb for tfstate locking state"
