@@ -3,10 +3,18 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-module "tfstate" {
+/*module "tfstate" {
   source = "./tfstate/"
   
-} 
+}
+module "s3" {
+  source = "./components/s3"
+  
+} */
+module "vpc" {
+  source = "./components/vpc"
+  
+}
 
 
 /* terraform {
