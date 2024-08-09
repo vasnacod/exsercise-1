@@ -41,7 +41,7 @@ resource "aws_route_table_association" "wordpressrtrta2" {
   route_table_id = aws_route_table.wordpressrt.id
 }
 
-resource "aws_security_group" "http" {
+resource "aws_security_group" "secgrupwp" {
   name   = "webwordpress"
   vpc_id = aws_vpc.wordpressvpc.id
 
@@ -52,13 +52,20 @@ resource "aws_security_group" "http" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  /* ingress {
+  ingress {
+    description = "HTTPS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  } */
+  }
 
   egress {
     from_port   = 0
