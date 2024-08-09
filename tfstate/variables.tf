@@ -5,7 +5,7 @@ variable "dynamotfstate" {
 }
 
 variable "s3tfstate" {
-    default = "tfstatelocking-323rgr2"
+    default = "exercise1-323rgr2"
     description = "s3 bucket for tfstate locking"
     type = string  
 }
