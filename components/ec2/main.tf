@@ -18,12 +18,12 @@ resource "aws_instance" "wordpressweb" {
     subnet_id = var.subnet_id
     vpc_security_group_ids = [var.secgrp_id]
     key_name = "local_key"
-      user_data = <<-EOF
+    user_data = <<-EOF
               sudo yum update -y
               sudo yum install -y httpd
               sudo systemctl start httpd
               sudo systemctl enable httpd
-              sudo su
-              sudo echo "<html><body><h1>Hello from vasnajcod for iwc my first tf ec2 complete coded with vpc sec</h1></body></html>" > /var/www/html/index.html
+              echo "<html><body><h1>Hello from vasnajcod for iwc my first tf ec2 complete coded with vpc sec</h1></body></html>" | sudo tee /var/www/html/index.html
+              sudo yum install aws-cli
               EOF
 }
