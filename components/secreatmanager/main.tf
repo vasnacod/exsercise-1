@@ -1,10 +1,6 @@
 resource "aws_secretsmanager_secret" "smanager" {
-  name        = "dbwpsecret"
-  description = "secret created"
-
-/*   tags = {
-    Environment = "production"
-  } */
+  name        = var.smname
+  description = "${var.project_name}-smng key"
 }
 
 resource "aws_secretsmanager_secret_version" "smanagerver" {

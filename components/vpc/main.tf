@@ -2,28 +2,36 @@ resource "aws_vpc" "wordpressvpc" {
     cidr_block = var.cidrvpc
 
     tags = {
-    Name = "wordpress_vpc"
+    Name = "${var.project_name}-vpc"
   }
   
 }
 
-resource "aws_subnet" "subnet1" {
+resource "aws_subnet" "public_subnet_az1_cidr" {
   vpc_id                  = aws_vpc.wordpressvpc.id
-  cidr_block              = var.subnet1
-  availability_zone       = var.azzonea
-}
-
-resource "aws_subnet" "subnet2" {
-  vpc_id                  = aws_vpc.wordpressvpc.id
-  cidr_block              = var.subnet2
+  cidr_block              = var.public_subnet_az1_cidr
   availability_zone       = var.azzonea
   map_public_ip_on_launch = true
+}
+
+resource "aws_subnet" "private_data_subnet_az1_cidr" {
+  vpc_id                  = aws_vpc.wordpressvpc.id
+  cidr_block              = var.private_data_subnet_az1_cidr
+  availability_zone       = var.azzonea
+  map_public_ip_on_launch = false
+}
+
+resource "aws_subnet" "private_data_subnet_az2_cidr" {
+  vpc_id                  = aws_vpc.wordpressvpc.id
+  cidr_block              = var.private_data_subnet_az2_cidr
+  availability_zone       = var.azzonea
+  map_public_ip_on_launch = false
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.wordpressvpc.id
   tags = {
-    Name = "wordpres_igw"
+    Name = "${var.project_name}-igw"
   }
 }
 
@@ -37,12 +45,12 @@ resource "aws_route_table" "wordpressrt" {
 }
 
 resource "aws_route_table_association" "wordpressrtrta2" {
-  subnet_id      = aws_subnet.subnet2.id
+  subnet_id      = aws_subnet.public_subnet_az1_cidr.id
   route_table_id = aws_route_table.wordpressrt.id
 }
 
 resource "aws_security_group" "secgrupwp" {
-  name   = "webwordpress"
+  name   = "${var.project_name}-ec2-sg"
   vpc_id = aws_vpc.wordpressvpc.id
 
   ingress {
@@ -75,6 +83,94 @@ resource "aws_security_group" "secgrupwp" {
   }
 
   tags = {
-    Name = "wordpress-sg"
+    Name = "${var.project_name}-ec2-sg"
   }
+}
+
+
+resource "aws_security_group" "database_sg" {
+  name        = "${var.project_name}-database-sg"
+  description = "${var.project_name}-database-sg"
+  vpc_id      = aws_vpc.wordpressvpc.id
+
+  ingress {
+    description     = "MySQL"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.secgrupwp.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-database-sg"
+  }
+}
+
+# role for ec2
+resource "aws_iam_role" "ec2_role" {
+  name = "ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+#policy for smanager
+resource "aws_iam_policy" "secretsmanager_policy" {
+  name        = "secretsmanager-access"
+  description = "Policy to access Secrets Manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ],
+        Effect = "Allow",
+        Resource = "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:dbwpsecret"
+      }
+    ]
+  })
+}
+
+#policy for s3
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "s3-access"
+  description = "Policy to access S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Effect = "Allow",
+        Resource = [
+          "arn:aws:s3:::wordpressdata-vasnacod1234",
+          "arn:aws:s3:::wordpressdata-vasnacod1234/*"
+        ]
+      }
+    ]
+  })
 }

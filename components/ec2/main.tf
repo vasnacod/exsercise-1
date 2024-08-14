@@ -13,17 +13,21 @@ resource "local_file" "local_key" {
     filename = "local_key"
 }
 resource "aws_instance" "wordpressweb" {
-    ami = var.ami_id
-    instance_type = var.instance_typevar
-    subnet_id = var.subnet_id
+    ami = var.ami
+    instance_type = var.ec2-instance-type
+    subnet_id = var.subnet1_id
     vpc_security_group_ids = [var.secgrp_id]
     key_name = "local_key"
     user_data = <<-EOF
-              sudo yum update -y
-              sudo yum install -y httpd
-              sudo systemctl start httpd
-              sudo systemctl enable httpd
-              echo "<html><body><h1>Hello from vasnajcod for iwc my first tf ec2 complete coded with vpc sec</h1></body></html>" | sudo tee /var/www/html/index.html
-              sudo yum install aws-cli
-              EOF
+#!/bin/bash
+sudo yum update -y
+sudo yum install -y httpd
+sudo systemctl start httpd
+sudo systemctl enable httpd
+echo "<html><body><h1>Hello from vasnajcod for iwc my first tf ec2 complete coded with vpc sec</h1></body></html>" | sudo tee /var/www/html/index.html
+sudo yum install -y aws-cli
+EOF
+tags = {
+    Name = "${var.project_name}-instance"
+  }
 }
