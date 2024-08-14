@@ -24,7 +24,7 @@ resource "aws_subnet" "private_data_subnet_az1_cidr" {
 resource "aws_subnet" "private_data_subnet_az2_cidr" {
   vpc_id                  = aws_vpc.wordpressvpc.id
   cidr_block              = var.private_data_subnet_az2_cidr
-  availability_zone       = var.azzonea
+  availability_zone       = var.azzoneb
   map_public_ip_on_launch = false
 }
 
@@ -115,7 +115,7 @@ resource "aws_security_group" "database_sg" {
 
 # role for ec2
 resource "aws_iam_role" "ec2_role" {
-  name = "ec2-role"
+  name = "${var.project_name}-ec2-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -133,7 +133,7 @@ resource "aws_iam_role" "ec2_role" {
 
 #policy for smanager
 resource "aws_iam_policy" "secretsmanager_policy" {
-  name        = "secretsmanager-access"
+  name        = "${var.project_name}-secretsmanager-access"
   description = "Policy to access Secrets Manager"
 
   policy = jsonencode({
@@ -145,7 +145,7 @@ resource "aws_iam_policy" "secretsmanager_policy" {
           "secretsmanager:DescribeSecret"
         ],
         Effect = "Allow",
-        Resource = "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:dbwpsecret"
+        Resource = "arn:aws:secretsmanager:${var.region}:${var.accountid}:secret:${var.smname}"
       }
     ]
   })
@@ -153,7 +153,7 @@ resource "aws_iam_policy" "secretsmanager_policy" {
 
 #policy for s3
 resource "aws_iam_policy" "s3_access_policy" {
-  name        = "s3-access"
+  name        = "${var.project_name}-s3-access"
   description = "Policy to access S3 bucket"
 
   policy = jsonencode({
@@ -167,10 +167,20 @@ resource "aws_iam_policy" "s3_access_policy" {
         ],
         Effect = "Allow",
         Resource = [
-          "arn:aws:s3:::wordpressdata-vasnacod1234",
-          "arn:aws:s3:::wordpressdata-vasnacod1234/*"
+          "arn:aws:s3:::${var.s3bucketname}",
+          "arn:aws:s3:::${var.s3bucketname}/*"
         ]
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "secretsmanager_attachment" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn  = aws_iam_policy.secretsmanager_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "s3_access_attachment" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn  = aws_iam_policy.s3_access_policy.arn
 }

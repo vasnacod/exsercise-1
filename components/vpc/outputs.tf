@@ -16,3 +16,6 @@ output "wpvpc_id" {
 output "databaserds_sg" {
   value = aws_security_group.database_sg.id  
 }
+output "ec2_role_name_vpc" {
+  value = aws_iam_role.ec2_role.name
+}

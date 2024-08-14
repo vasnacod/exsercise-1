@@ -1,12 +1,12 @@
 resource "aws_s3_bucket" "wordpressdata" {
-    bucket = var.wordpress-data
+    bucket = var.s3bucketname
 
   tags = {
-    Name = var.wordpress-data
+    Name = "${var.project_name}-s3bucket"
   }
 }
 
-resource "aws_iam_role" "ec2_role" {
+/* resource "aws_iam_role" "ec2_role" {
   name = "${var.wordpress-data}_ec2_role"
 
   assume_role_policy = jsonencode({
@@ -27,8 +27,8 @@ resource "aws_iam_role" "ec2_role" {
     ]
   })
 }
-
-resource "aws_iam_policy" "s3_access_policy" {
+ */
+/* resource "aws_iam_policy" "s3_access_policy" {
   name        = "${var.wordpress-data}_s3_access_policy"
   description = "Policy to allow EC2 instances to access S3 bucket"
   
@@ -49,22 +49,22 @@ resource "aws_iam_policy" "s3_access_policy" {
       }
     ]
   })
-}
+} */
 
-resource "aws_iam_role_policy_attachment" "ec2_role_policy_attachment" {
+/* resource "aws_iam_role_policy_attachment" "ec2_role_policy_attachment" {
   role      = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.s3_access_policy.arn
-}
-resource "aws_s3_bucket_public_access_block" "wordpressdata_block" {
+} */
+/* resource "aws_s3_bucket_public_access_block" "wordpressdata_block" {
   bucket = aws_s3_bucket.wordpressdata.id
 
   block_public_acls = false
   ignore_public_acls = false
   block_public_policy = false
   restrict_public_buckets = false
-}
+} */
 
-resource "aws_s3_bucket_website_configuration" "wordpresssite" {
+/* resource "aws_s3_bucket_website_configuration" "wordpresssite" {
   bucket = aws_s3_bucket.wordpressdata.id
 
   index_document {
@@ -74,9 +74,9 @@ resource "aws_s3_bucket_website_configuration" "wordpresssite" {
   error_document {
     key = "error.html"
   }
-}
+} */
 
-resource "aws_s3_bucket_policy" "public_policy" {
+/* resource "aws_s3_bucket_policy" "public_policy" {
   bucket = aws_s3_bucket.wordpressdata.id
 
   policy = jsonencode({
@@ -91,4 +91,4 @@ resource "aws_s3_bucket_policy" "public_policy" {
       }
     ]
   })
-}
+} */

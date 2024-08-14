@@ -8,3 +8,4 @@ variable "secgrp_id" {
 variable "ami" {}
 variable "ec2-instance-type" {}
 variable "project_name" {}
+variable "ec2_role_name_ec" {}

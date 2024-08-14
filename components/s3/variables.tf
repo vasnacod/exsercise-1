@@ -1,10 +1,4 @@
-variable "wordpress-data" {
-    default = "wordpressdata-vasnacod1234"
+variable "project_name" {}
+variable "s3bucketname" {
     description = "s3 bucket for wordpress site"
-    type = string  
-}
-variable "accountid" {
-    default = "1234567"
-    description = "account id"
-    type = number
 }

@@ -12,12 +12,18 @@ resource "local_file" "local_key" {
     content  = tls_private_key.rsa.private_key_pem
     filename = "local_key"
 }
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${var.project_name}-ec2-instance-profile"
+  role = var.ec2_role_name_ec
+}
 resource "aws_instance" "wordpressweb" {
     ami = var.ami
     instance_type = var.ec2-instance-type
     subnet_id = var.subnet1_id
     vpc_security_group_ids = [var.secgrp_id]
     key_name = "local_key"
+    iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
     user_data = <<-EOF
 #!/bin/bash
 sudo yum update -y

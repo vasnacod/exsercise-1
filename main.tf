@@ -7,23 +7,25 @@ provider "aws" {
   source = "./tfstate/"
   
 }*/
-module "secrets_manager" {
+/* module "secrets_manager" {
 source = "./components/secreatmanager"
 db_username = var.db_username
 db_password = var.db_password
 project_name = var.project_name
 smname = var.smname
-}
-output "smanger_arnto" {
+} */
+/* output "smanger_arnto" {
   value = module.secrets_manager.secret_arn
 }
 output "smanger_nameto" {
   value = module.secrets_manager.secret_name
-}
-/*mmodule "s3" {
+} */
+module "s3" {
   source = "./components/s3"
+  project_name = var.project_name
+  s3bucketname = var.s3bucketname
   
-}*/
+}
 module "vpc" {
   source = "./components/vpc"
   project_name = var.project_name
@@ -32,19 +34,22 @@ module "vpc" {
   private_data_subnet_az1_cidr = var.private_data_subnet_az1_cidr
   private_data_subnet_az2_cidr = var.private_data_subnet_az2_cidr
   azzonea = var.azzonea
-
+  azzoneb = var.azzoneb
+  s3bucketname = var.s3bucketname
+  region = var.region
+  smname = var.smname
+  accountid = var.accountid
 }
 
-/* module "rds" {
+module "rds" {
   source        = "./components/rds"
   subnet1rds_id = module.vpc.subnet2_id
   subnet2rds_id = module.vpc.subnet3_id
   rds_vpc       = module.vpc.wpvpc_id
   database_sg = module.vpc.databaserds_sg
-  db_username   = var.db_username
-  db_password   = var.db_password
   project_name = var.project_name
-} */
+  secmng_arn = module.secreatmanager.secret_arn
+}
 
  module "ec2" {
   source    = "./components/ec2"
@@ -53,8 +58,8 @@ module "vpc" {
   ami = var.ami
   ec2-instance-type = var.ec2-instance-type
   project_name = var.project_name
-
-}
+  ec2_role_name_ec = module.vpc.ec2_role_name_vpc
+ }
 
 /* terraform {
   backend "s3" {
