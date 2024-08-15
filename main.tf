@@ -7,13 +7,14 @@ provider "aws" {
   source = "./tfstate/"
   
 }*/
-/* module "secrets_manager" {
-source = "./components/secreatmanager"
-db_username = var.db_username
-db_password = var.db_password
-project_name = var.project_name
-smname = var.smname
-} */
+module "secretmanager" {
+  source = "./components/secretmanager"
+  db_name = var.db_name
+  db_username = var.db_username
+  db_password = var.db_password
+  project_name = var.project_name
+  smname = var.smname
+}
 /* output "smanger_arnto" {
   value = module.secrets_manager.secret_arn
 }
@@ -48,7 +49,15 @@ module "rds" {
   rds_vpc       = module.vpc.wpvpc_id
   database_sg = module.vpc.databaserds_sg
   project_name = var.project_name
-  secmng_arn = module.secreatmanager.secret_arn
+  #secmng_arn = module.secreatmanager.secret_arn
+  db_name      = module.secretmanager.smdb_name
+  db_username  = module.secretmanager.smdb_username
+  db_password  = module.secretmanager.smdb_password
+  rds_allocated_storage = var.rds_allocated_storage
+  rds_storage_type      = var.rds_storage_type
+  rds_engine            = var.rds_engine
+  rds_engine_version    = var.rds_engine_version
+  rds_instance_class    = var.rds_instance_class
 }
 
  module "ec2" {
@@ -59,6 +68,7 @@ module "rds" {
   ec2-instance-type = var.ec2-instance-type
   project_name = var.project_name
   ec2_role_name_ec = module.vpc.ec2_role_name_vpc
+  lkeyname = var.lkeyname
  }
 
 /* terraform {
