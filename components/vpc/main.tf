@@ -143,7 +143,7 @@ resource "aws_iam_policy" "secretsmanager_policy" {
           "secretsmanager:DescribeSecret"
         ],
         Effect = "Allow",
-        Resource = "arn:aws:secretsmanager:${var.region}:${var.accountid}:secret:${var.smname}"
+        Resource = "${var.ssm_arn}"
       }
     ]
   })
@@ -172,6 +172,7 @@ resource "aws_iam_policy" "s3_access_policy" {
     ]
   })
 }
+
 #policy for rds
 resource "aws_iam_policy" "rds_policy" {
   name        = "${var.project_name}-rds-access"

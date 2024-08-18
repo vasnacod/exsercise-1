@@ -3,10 +3,22 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-/*module "tfstate" {
+/* module "tfstate" {
   source = "./tfstate/"
-  
-}*/
+  dynamotfstate = var.dynamotfstate
+  s3tfstate = var.s3tfstate  
+} */
+
+/* terraform {
+  backend "s3" {
+    bucket         = var.s3tfstate
+    key            = var.s3key
+    region         = var.region
+    encrypt        = true
+    dynamodb_table = var.dynamotfstate
+  }
+} */
+
 module "secretmanager" {
   source = "./components/secretmanager"
   db_name = var.db_name
@@ -39,7 +51,7 @@ module "vpc" {
   s3bucketname = var.s3bucketname
   region = var.region
   smname = var.smname
-  accountid = var.accountid
+  ssm_arn = module.secretmanager.secret_arn
 }
 
 module "rds" {
@@ -70,13 +82,3 @@ module "rds" {
   ec2_role_name_ec = module.vpc.ec2_role_name_vpc
   lkeyname = var.lkeyname
  }
-
-/* terraform {
-  backend "s3" {
-    bucket         = var.s3tfstate
-    key            = "tfstatelock/terraform.tfstate"
-    region         = var.region
-    encrypt        = true
-    dynamodb_table = var.dynamotfstate
-  }
-} */

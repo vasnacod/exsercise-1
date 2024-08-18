@@ -15,6 +15,7 @@ variable "azzoneb" {}
 # tfstate vars
 variable "dynamotfstate" {}
 variable "s3tfstate" {}
+variable "s3key" {}
 # RDS vars
 variable "db_name" {}
 variable "db_username" {}
